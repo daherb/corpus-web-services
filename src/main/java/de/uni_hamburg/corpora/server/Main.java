@@ -67,7 +67,8 @@ public class Main {
                 + "%s%nHit Ctrl-C to stop it...", BASE_URI));
         System.in.read();
         main.logger.warn("Shutting down server");
-        server.stop();
+        server.shutdown();
+
         try {
             Main.cleanupThreads();
         } catch (InterruptedException e) {
