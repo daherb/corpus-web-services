@@ -11,8 +11,9 @@ import java.net.URI;
 import java.util.ArrayList;
 
 /**
- * Main class.
- *
+ * @author bba1792 Dr. Herbert Lange
+ * @version 20210630
+ * Main class creating the web server and handling a list of threads
  */
 public class Main {
     // Base URI the Grizzly HTTP server will listen on

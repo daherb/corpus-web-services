@@ -24,7 +24,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-// Worker thread
+/**
+ * @author bba1792 Dr. Herbert Lange
+ * @version 20210630
+ * Worker thread for the corpus checker
+ */
 class CorpusThread extends Thread {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
@@ -114,7 +118,9 @@ class CorpusThread extends Thread {
 }
 
 /**
- * Root resource (exposed at "corpus" path)
+ * @author bba1792 Dr. Herbert Lange
+ * @version 20210630
+ * Resource to run the corpus checker on a corpus
  */
 @Path("check_corpus")
 public class CorpusChecker {

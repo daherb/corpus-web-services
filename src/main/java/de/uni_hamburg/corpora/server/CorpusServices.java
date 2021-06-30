@@ -9,7 +9,17 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * @author bba1792 Dr. Herbert Lange
+ * @version 20210630
+ * Class encapsulating some of the corpus services functionality
+ */
 public class CorpusServices {
+    /**
+     * Gets the names of all corpus functions, ie all classes implementing CorpusFunction, defined in de.uni_hamburg.corpora.
+     *
+     * @return the list of corpus functions
+     */
     public static Set<String> getCorpusFunctions() {
         // Get all classes implementing the interface via reflections
         Reflections reflections = new Reflections("de.uni_hamburg.corpora");
@@ -19,6 +29,11 @@ public class CorpusServices {
         return classNames ;
     }
 
+    /**
+     * Gets the class names of all corpus types, ie all classes derived from CorpusData, defined in de.uni_hamburg.corpora.
+     *
+     * @return the list of corpus types
+     */
     public static Set<String> getCorpusTypes () {
         Reflections reflections = new Reflections("de.uni_hamburg.corpora");
         HashSet<String> classNames = new HashSet<>();

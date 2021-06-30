@@ -10,7 +10,9 @@ import javax.ws.rs.core.MediaType;
 import java.util.Set;
 
 /**
- * Root resource (exposed at "myresource" path)
+ * @author bba1792 Dr. Herbert Lange
+ * @version 20210630
+ * Resource to list corpus data types defined in the corpus services
  */
 @Path("/list_corpus_types")
 public class ListCorpusTypes {
