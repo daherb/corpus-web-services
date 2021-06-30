@@ -8,29 +8,17 @@ import java.lang.Thread;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL ;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.thoughtworks.xstream.XStream;
 import de.uni_hamburg.corpora.*;
 
-import de.uni_hamburg.corpora.validation.Checker;
-import org.apache.commons.io.FilenameUtils ;
-import org.exmaralda.partitureditor.fsm.FSMException;
 import org.exmaralda.partitureditor.jexmaralda.JexmaraldaException;
-import org.jdom.JDOMException;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +42,7 @@ class CorpusThread extends Thread {
 
     public void run() {
         ArrayList<String> functionList = new ArrayList<String>(Arrays.asList(functionNames.split(",")));
-        Set<String> allFunctions = CorpusService.getCorpusFunctions() ;
+        Set<String> allFunctions = CorpusServices.getCorpusFunctions() ;
         CorpusIO cio = new CorpusIO();
 
         try {
@@ -130,15 +118,6 @@ class CorpusThread extends Thread {
  */
 @Path("corpus")
 public class CorpusService {
-
-    public static Set<String> getCorpusFunctions() {
-        // Get all classes implementing the interface via reflections
-        Reflections reflections = new Reflections("de.uni_hamburg.corpora");
-        Set<Class<? extends CorpusFunction>> classes = reflections.getSubTypesOf(CorpusFunction.class);
-        // Convert classes to class names
-        Set<String> classNames = classes.stream().map(Class::getCanonicalName).collect(Collectors.toSet());
-        return classNames ;
-    }
 
     public CorpusService() {
 
