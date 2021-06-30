@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 
 /**
  * Main class.
@@ -18,6 +19,8 @@ public class Main {
     public static final String BASE_URI = "http://localhost:8080/";
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+
+    private static ArrayList<Thread> threads = new ArrayList<Thread>();
     /**
      * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.
      * @return Grizzly HTTP server.
@@ -33,6 +36,25 @@ public class Main {
     }
 
     /**
+     * Adds thread to list of all running threads to be joined later.
+     *
+     * @param t the thread to be added
+     */
+    public static void addThread(Thread t) {
+        Main.threads.add(t);
+    }
+
+    /**
+     * Cleanup threads by joining them.
+     *
+     * @throws InterruptedException the interrupted exception
+     */
+    public static void cleanupThreads() throws InterruptedException {
+        for (Thread t : Main.threads) {
+            t.join();
+        }
+    }
+    /**
      * Main method.
      * @param args
      * @throws IOException
@@ -46,6 +68,11 @@ public class Main {
         System.in.read();
         main.logger.warn("Shutting down server");
         server.stop();
+        try {
+            Main.cleanupThreads();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
 
