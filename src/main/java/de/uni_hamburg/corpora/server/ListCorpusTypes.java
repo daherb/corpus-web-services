@@ -26,12 +26,7 @@ public class ListCorpusTypes {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getIt() {
-       /* Reflections reflections = new Reflections("de.uni_hamburg.corpora");
-        Set<Class<? extends CorpusData>> classes = reflections.getSubTypesOf(CorpusData.class);*/
         StringBuilder classNames = new StringBuilder() ;
-        /*for (Class c : classes) {
-            classNames.append(c.getCanonicalName()+"\n");
-        }*/
         for (String cn : CorpusServices.getCorpusTypes()) {
             classNames.append(cn + "\n");
         }
