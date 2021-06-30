@@ -1,7 +1,8 @@
 package de.uni_hamburg.corpora.server;
 
 import de.uni_hamburg.corpora.CorpusFunction;
-import org.reflections.Reflections;
+import org.jdom.*;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,11 +10,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Set;
 
 /**
  * @author bba1792 Dr. Herbert Lange
@@ -34,40 +31,37 @@ public class ListCorpusFunctions {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public String listFunctions() {
-        StringBuilder classNames = new StringBuilder() ;
-        classNames.append("<html>\n");
-        classNames.append("<body>\n");
-        classNames.append("<table>\n");
+        StringBuilder classNames = new StringBuilder();
+        Element htmlTable = new Element("table");
         for (String s : CorpusServices.getCorpusFunctions()) {
-            String function, description ;
+            Content function, description;
             try {
                 CorpusFunction cf = (CorpusFunction) Class.forName(s).getDeclaredConstructor().newInstance();
-                function = cf.getFunction() ;
+                function = new Text(cf.getFunction());
                 try {
-                    description = cf.getDescription();
+                    description = new Text(cf.getDescription());
+                } catch (Exception e) {
+                    description = new Element("span")
+                            .addContent(new Text("Error reading description"))
+                            .setAttribute("style","color:red");
                 }
-                catch (Exception e) {
-                    description = "Error reading description" ;
-                    logger.error("WTF",e);
-                }
-                //logger.info(cf.getDescription()) ;
             } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                function = s ;
-                description = "Class not found";
+                function = new Text(s);
+                description = new Element("span")
+                        .addContent(new Text("Error loading class"))
+                        .setAttribute("style","color:red");
             }
+            Element htmlRow = new Element("tr");
+            htmlRow.addContent(new Element("td").addContent(function));
+            htmlRow.addContent(new Element("td").addContent(description));
+            htmlTable.addContent(htmlRow);
 
-            classNames.append("<tr>\n");
-            classNames.append("<td>");
-            classNames.append(function) ;
-            classNames.append("</td><td>");
-            classNames.append(description);
-            classNames.append("</td>\n");
-            //classNames.append("<td>"+s+"</td>");
-            classNames.append("</tr>\n");
         }
-        classNames.append("</table>\n");
-        classNames.append("</body>\n");
-        classNames.append("</html>\n");
-        return classNames.toString() ;
+        Document html = new Document(
+                new Element("html")
+                        .addContent(new Element("body")
+                        .addContent(htmlTable)),
+                new DocType("html"));
+        return new XMLOutputter().outputString(html);
     }
 }
