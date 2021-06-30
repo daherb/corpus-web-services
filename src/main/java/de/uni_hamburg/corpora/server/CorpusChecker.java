@@ -116,10 +116,10 @@ class CorpusThread extends Thread {
 /**
  * Root resource (exposed at "corpus" path)
  */
-@Path("corpus")
-public class CorpusService {
+@Path("check_corpus")
+public class CorpusChecker {
 
-    public CorpusService() {
+    public CorpusChecker() {
 
     }
 
