@@ -96,9 +96,9 @@ class CorpusThread extends Thread {
             e.printStackTrace();
         }
 
-        logger.warn("Done with all functions");
+        logger.info("Done with all functions");
         report.addNote("CorpusService","Finished all tests");
-        logger.warn("Creating report");
+        logger.info("Creating report");
         // Generate HTML report
         Collection<ReportItem> rawStatistics = report.getRawStatistics();
         logger.warn("Got {} items", rawStatistics.size());
@@ -109,7 +109,7 @@ class CorpusThread extends Thread {
         //String reportOutput = xstream.toXML(report.getRawStatistics());
         // or just errors
         //String reportOutput = xstream.toXML(report.getErrorStatistics());
-        logger.warn("Writing report");
+        logger.info("Writing report");
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(new File(outFile)));
             out.write(reportOutput);
@@ -117,7 +117,7 @@ class CorpusThread extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        logger.warn("Done with report");
+        logger.info("Done with report");
         if (!callbackUrl.equals("")) {
             Client c = ClientBuilder.newClient();
             logger.info("Contacting callback");
