@@ -118,6 +118,24 @@ class CorpusThread extends Thread {
             e.printStackTrace();
         }
         logger.warn("Done with report");
+        if (!callbackUrl.equals("")) {
+            Client c = ClientBuilder.newClient();
+            logger.info("Contacting callback");
+            try {
+                c.target(callbackUrl)
+                        .queryParam("token", token)
+                        .queryParam("output", outFile)
+                        .request().header("Connection", "close")
+                        .buildGet()
+                        .invoke()
+                        .close();
+                logger.info("Done with callback");
+            }
+            catch (Exception e) {
+                logger.error("Failed contacting callback", e);
+            }
+        }
+
     }
 }
 
