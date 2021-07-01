@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author bba1792 Dr. Herbert Lange
- * @version 20210630
+ * @version 20210701
  * Class encapsulating some of the corpus services functionality
  */
 public class CorpusServices {
@@ -25,8 +25,7 @@ public class CorpusServices {
         Reflections reflections = new Reflections("de.uni_hamburg.corpora");
         Set<Class<? extends CorpusFunction>> classes = reflections.getSubTypesOf(CorpusFunction.class);
         // Convert classes to class names
-        Set<String> classNames = classes.stream().filter((c) -> !Modifier.isAbstract(c.getModifiers())).map(Class::getCanonicalName).collect(Collectors.toSet());
-        return classNames ;
+        return classes.stream().filter((c) -> !Modifier.isAbstract(c.getModifiers())).map(Class::getCanonicalName).collect(Collectors.toSet());
     }
 
     /**
@@ -38,7 +37,7 @@ public class CorpusServices {
         Reflections reflections = new Reflections("de.uni_hamburg.corpora");
         HashSet<String> classNames = new HashSet<>();
         Set<Class<? extends CorpusData>> classes = reflections.getSubTypesOf(CorpusData.class);
-        for (Class c : classes) {
+        for (Class<? extends CorpusData> c : classes) {
             classNames.add(c.getCanonicalName());
         }
         return classNames ;
