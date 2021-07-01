@@ -3,8 +3,6 @@ package de.uni_hamburg.corpora.server;
 import de.uni_hamburg.corpora.CorpusFunction;
 import org.jdom.*;
 import org.jdom.output.XMLOutputter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -14,14 +12,11 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author bba1792 Dr. Herbert Lange
- * @version 20210630
+ * @version 20210701
  * Resource to list corpus functions defined in the corpus services
  */
-@Path("/list_corpus_functions")
+@Path("list_corpus_functions")
 public class ListCorpusFunctions {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-
     /**
      * Method handling HTTP GET requests. The returned object will be sent
      * to the client as "text/plain" media type.
@@ -31,7 +26,6 @@ public class ListCorpusFunctions {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public String listFunctions() {
-        StringBuilder classNames = new StringBuilder();
         Element htmlTable = new Element("table");
         for (String s : CorpusServices.getCorpusFunctions()) {
             Content function, description;
