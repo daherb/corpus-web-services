@@ -9,24 +9,25 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import de.uni_hamburg.corpora.*;
 
 import org.exmaralda.partitureditor.jexmaralda.JexmaraldaException;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 /**
  * @author bba1792 Dr. Herbert Lange
- * @version 20210630
+ * @version 20210701
  * Worker thread for the corpus checker
  */
 class CorpusThread extends Thread {
@@ -49,16 +50,16 @@ class CorpusThread extends Thread {
     }
 
     public void run() {
-        ArrayList<String> functionList = new ArrayList<String>(Arrays.asList(functionNames.split(",")));
+        ArrayList<String> functionList = new ArrayList<>(Arrays.asList(functionNames.split(",")));
         Set<String> allFunctions = CorpusServices.getCorpusFunctions() ;
         CorpusIO cio = new CorpusIO();
 
         try {
             // Create corpus from given input file/folder
             Corpus corpus = new Corpus(cio.read(new File(inFile).toURI().toURL())) ;
-            System.out.println("Loaded " + Integer.toString(corpus.getCorpusData().size()) + " files");
+            logger.info("Loaded " + corpus.getCorpusData().size() + " corpus files");
             // For all functions to be applied, get their canonical name and create an object for them
-            Set<CorpusFunction> functions = new HashSet<CorpusFunction>() ;
+            Set<CorpusFunction> functions = new HashSet<>() ;
             for (String function : functionList) {
                 // Indicator if we encountered the function
                 boolean found = false ;
@@ -101,17 +102,13 @@ class CorpusThread extends Thread {
         logger.info("Creating report");
         // Generate HTML report
         Collection<ReportItem> rawStatistics = report.getRawStatistics();
-        logger.warn("Got {} items", rawStatistics.size());
-        String reportOutput = report.getSummaryLines(); ReportItem.generateDataTableHTML(report.getRawStatistics(), report.getSummaryLines());
+        String reportOutput = ReportItem.generateDataTableHTML(rawStatistics, report.getSummaryLines());
         // Alternative: Generate XML
         //XStream xstream = new XStream();
-        // either all reports
-        //String reportOutput = xstream.toXML(report.getRawStatistics());
-        // or just errors
-        //String reportOutput = xstream.toXML(report.getErrorStatistics());
+        //String reportOutput = xstream.toXML(rawStatistics);
         logger.info("Writing report");
         try {
-            BufferedWriter out = new BufferedWriter(new FileWriter(new File(outFile)));
+            BufferedWriter out = new BufferedWriter(new FileWriter(outFile));
             out.write(reportOutput);
             out.close();
         } catch (IOException e) {
