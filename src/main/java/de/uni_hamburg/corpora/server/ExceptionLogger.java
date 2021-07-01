@@ -6,13 +6,13 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-import java.io.PrintStream;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
  * @author bba1792 Dr. Herbert Lange
- * @version 20210630
+ * @version 20210701
  * The Exception handler logging exceptions.
  */
 @Provider
