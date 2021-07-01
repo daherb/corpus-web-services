@@ -1,20 +1,17 @@
 package de.uni_hamburg.corpora.server;
 
-import de.uni_hamburg.corpora.CorpusData;
-import org.reflections.Reflections;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.Set;
+import javax.ws.rs.core.Response;
 
 /**
  * @author bba1792 Dr. Herbert Lange
  * @version 20210630
  * Resource to list corpus data types defined in the corpus services
  */
-@Path("/list_corpus_types")
+@Path("list_corpus_types")
 public class ListCorpusTypes {
 
     /**
@@ -25,11 +22,11 @@ public class ListCorpusTypes {
      */
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String getIt() {
+    public Response listCorpusTypes() {
         StringBuilder classNames = new StringBuilder() ;
         for (String cn : CorpusServices.getCorpusTypes()) {
             classNames.append(cn + "\n");
         }
-        return classNames.toString();
+        return Response.ok().entity(classNames.toString()).build();
     }
 }
