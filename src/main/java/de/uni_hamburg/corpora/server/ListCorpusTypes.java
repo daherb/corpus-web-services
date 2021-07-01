@@ -8,7 +8,7 @@ import javax.ws.rs.core.Response;
 
 /**
  * @author bba1792 Dr. Herbert Lange
- * @version 20210630
+ * @version 20210701
  * Resource to list corpus data types defined in the corpus services
  */
 @Path("list_corpus_types")
@@ -25,7 +25,8 @@ public class ListCorpusTypes {
     public Response listCorpusTypes() {
         StringBuilder classNames = new StringBuilder() ;
         for (String cn : CorpusServices.getCorpusTypes()) {
-            classNames.append(cn + "\n");
+            classNames.append(cn);
+            classNames.append("\n");
         }
         return Response.ok().entity(classNames.toString()).build();
     }
