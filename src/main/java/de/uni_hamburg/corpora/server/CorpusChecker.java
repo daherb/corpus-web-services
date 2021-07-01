@@ -37,11 +37,15 @@ class CorpusThread extends Thread {
     String inFile ;
     String functionNames;
     String outFile;
+    String token; // Identifier to be sent back to the server to identify and authorize task
+    String callbackUrl; // URL to be called when the task is done, giving an empty string means skipping the callback
 
-    CorpusThread(String infile, String outfile, String functions) {
+    CorpusThread(String infile, String outfile, String functions, String token, String callbackUrl) {
         this.inFile = infile;
         this.functionNames = functions ;
         this.outFile = outfile;
+        this.token = token ;
+        this.callbackUrl = callbackUrl ;
     }
 
     public void run() {
@@ -138,7 +142,11 @@ public class CorpusChecker {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String checkCorpus(@QueryParam("input") String input, @QueryParam("output") String output, @QueryParam("functions") String functions) {
+    public Response checkCorpus(@QueryParam("input") String input,
+                              @QueryParam("output") String output,
+                              @QueryParam("functions") String functions,
+                              @QueryParam("token") String token,
+                              @QueryParam("callback") String callbackUrl) {
         //String defaultInfile = "/home/herb/projects/code/hamburg/testcorpora/exmeralda/MEDIA-TEST-BATTERY" ;
         String defaultInfile = "/home/herb/projects/code/hamburg/testcorpora/exmeralda/hmat" ;
         //String defaultOutfile = "/tmp/MEDIA-TEST-BATTERY.html" ;
@@ -163,6 +171,8 @@ public class CorpusChecker {
         defaultFunctions += ",NullChecker" ;
         defaultFunctions += ",ExbLangCodes" ;
         // String defaultFunctions = "NullChecker" ;
+        //String defaultToken = "0xdeadbeef";
+        //String defaultCallbackUrl = "http://localhost:8081/callback";
         if (input == null) {
             input = defaultInfile ;
         }
@@ -172,10 +182,12 @@ public class CorpusChecker {
         if (functions == null) {
             functions = defaultFunctions;
         }
-        CorpusThread ct = new CorpusThread(input,output,functions);
+        CorpusThread ct = new CorpusThread(input,output,functions,token,callbackUrl);
         ct.start();
         Main.addThread(ct);
-        return ("Executing " + functions + " on " + input + ". Result will be in " + output) ;
+        return Response.ok().entity("Executing " + functions + " on " + input +
+                ". Result will be in " + output +
+                ". When finished " + callbackUrl + " will be accessed using " + token).build() ;
     }
 
 }
