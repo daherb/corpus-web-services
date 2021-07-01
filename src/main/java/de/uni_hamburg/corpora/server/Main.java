@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 /**
  * @author bba1792 Dr. Herbert Lange
- * @version 20210630
+ * @version 20210701
  * Main class creating the web server and handling a list of threads
  */
 public class Main {
@@ -21,7 +21,7 @@ public class Main {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-    private static ArrayList<Thread> threads = new ArrayList<Thread>();
+    private final static ArrayList<Thread> threads = new ArrayList<>();
     /**
      * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.
      * @return Grizzly HTTP server.
@@ -30,6 +30,7 @@ public class Main {
         // create a resource config that scans for JAX-RS resources and providers
         // in de.uni_hamburg.corpora package
         final ResourceConfig rc = new ResourceConfig().packages("de.uni_hamburg.corpora.server");
+        //rc.register(new LoggingFeature((java.util.logging.Logger) null));
         // create and start a new instance of grizzly http server
         // exposing the Jersey application at BASE_URI
         return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
@@ -56,8 +57,8 @@ public class Main {
     }
     /**
      * Main method.
-     * @param args
-     * @throws IOException
+     * @param args No command line arguments expected
+     * @throws IOException Exception on server problems
      */
     public static void main(String[] args) throws IOException {
         Main main = new Main();
