@@ -1,16 +1,24 @@
 package de.uni_hamburg.corpora.server;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonObject;
 import de.uni_hamburg.corpora.CorpusFunction;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author bba1792 Dr. Herbert Lange
- * @version 20210701
+ * @version 20210705
  * Resource to list corpus functions defined in the corpus services
  */
 @Path("list_corpus_functions")
@@ -22,38 +30,45 @@ public class ListCorpusFunctions {
      * @return String that will be returned as a text/plain response.
      */
     @GET
-    @Produces(MediaType.TEXT_HTML)
-    public String listFunctions() {
-        Element htmlTable = new Element("table");
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listFunctions() {
+        ArrayList<Map<String,String>> functionList = new ArrayList<>() ;
         for (String s : CorpusServices.getCorpusFunctions()) {
-            Content function, description;
+            String function, description;
+            boolean available ;
             try {
                 CorpusFunction cf = (CorpusFunction) Class.forName(s).getDeclaredConstructor().newInstance();
-                function = new Text(cf.getFunction());
+                function = cf.getFunction();
                 try {
-                    description = new Text(cf.getDescription());
+                    description = cf.getDescription();
+                    available = true ;
                 } catch (Exception e) {
-                    description = new Element("span")
-                            .addContent(new Text("Error reading description"))
-                            .setAttribute("style","color:red");
+                    description = "Error reading description" ;
+                    available = false ;
                 }
             } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                function = new Text(s);
-                description = new Element("span")
-                        .addContent(new Text("Error loading class"))
-                        .setAttribute("style","color:red");
+                function = s ;
+                description = "Error loading class" ;
+                available = false ;
             }
-            Element htmlRow = new Element("tr");
-            htmlRow.addContent(new Element("td").addContent(function));
-            htmlRow.addContent(new Element("td").addContent(description));
-            htmlTable.addContent(htmlRow);
+            HashMap<String,String> functionInfo = new HashMap<>();
+            functionInfo.put("name", function);
+            functionInfo.put("description",description);
+            functionInfo.put("available",Boolean.toString(available));
 
+            functionList.add(functionInfo);
         }
-        Document html = new Document(
-                new Element("html")
-                        .addContent(new Element("body")
-                        .addContent(htmlTable)),
-                new DocType("html"));
-        return new XMLOutputter().outputString(html);
+        // Sort the list by name
+        functionList.sort(Comparator.comparing((x) -> x.get("name")));
+        // Convert to JSON
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String json = mapper.writeValueAsString(functionList);
+            return Response.ok().entity(json).build() ;
+        }
+        // On error return empty JSON and an error code
+        catch (JsonProcessingException e) {
+            return Response.status(400).entity(new JsonObject().toString()).build();
+        }
     }
 }
