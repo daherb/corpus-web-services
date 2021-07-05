@@ -1,5 +1,7 @@
 package de.uni_hamburg.corpora.server;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonParseException;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.junit.After;
 import org.junit.Before;
@@ -14,12 +16,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
 /**
  * @author bba1792 Dr. Herbert Lange
- * @version 20210701
+ * @version 20210705
  * Test for the list_corpus_functions resource
  */
 public class ListCorpusFunctionsTest {
@@ -54,21 +58,20 @@ public class ListCorpusFunctionsTest {
      */
     @Test
     public void testListFunctions() {
-        logger.info("Run listFunctions test");
-        Response rsp = target.path("list_corpus_functions").request().buildGet().invoke();
+        logger.info("Run listFunctions test") ;
+        Response rsp = target.path("list_corpus_functions").request().buildGet().invoke() ;
         // First check the media type in the header
-        assertEquals("Media type is HTML", MediaType.TEXT_HTML, rsp.getMediaType().toString());
-        String responseMsg = rsp.readEntity(String.class);
+        assertEquals("Status code is success, i.e. 200", 200, rsp.getStatus()) ;
+        assertEquals("Media type is JSON", MediaType.APPLICATION_JSON, rsp.getMediaType().toString()) ;
+        String responseMsg = rsp.readEntity(String.class) ;
         // Then read the body as xml and look for table rows
         try {
-            Document response = new SAXBuilder().build(new StringReader(responseMsg)) ;
-            assertEquals("DocType is HTML", new DocType("html").toString(),response.getDocType().toString());
-            assertEquals("Root element is html", "html",response.getRootElement().getName());
-            // Get all rows from the table
-            XPath rows = XPath.newInstance("//tr");
-            assertNotEquals("There should be at least some functions in the table",0,rows.selectNodes(response).size());
-        } catch (JDOMException | IOException e) {
-            fail("Unable to parse the response as DOM");
+            ObjectMapper mapper = new ObjectMapper() ;
+            ArrayList<Map<String,String >> functionList = mapper.readValue(responseMsg,ArrayList.class) ;
+            assertNotEquals("There should be at least some functions in the list",0,functionList.size()) ;
+            assertEquals("The first function name in the list is", "AddCSVMetadataToComa",functionList.get(0).get("name"));
+        } catch (IOException | JsonParseException e) {
+            fail("Unable to parse the response as JSON");
         }
     }
 }
