@@ -1,8 +1,6 @@
 package de.uni_hamburg.corpora.server;
 
 import de.uni_hamburg.corpora.CorpusFunction;
-import org.jdom.*;
-import org.jdom.output.XMLOutputter;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

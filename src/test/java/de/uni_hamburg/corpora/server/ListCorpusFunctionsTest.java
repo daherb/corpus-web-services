@@ -1,11 +1,6 @@
 package de.uni_hamburg.corpora.server;
 
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.jdom.DocType;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.xpath.XPath;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +14,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.io.IOException;
-import java.io.StringReader;
 
 import static org.junit.Assert.*;
 

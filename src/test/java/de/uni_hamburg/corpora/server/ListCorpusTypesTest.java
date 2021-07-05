@@ -1,11 +1,6 @@
 package de.uni_hamburg.corpora.server;
 
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.jdom.DocType;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.xpath.XPath;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,14 +12,12 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.StringReader;
 
 import static org.junit.Assert.*;
 
 /**
  * @author bba1792 Dr. Herbert Lange
- * @version 20210701
+ * @version 20210705
  * Test for the list_corpus_types resource
  */
 public class ListCorpusTypesTest {
