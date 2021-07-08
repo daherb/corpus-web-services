@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -18,6 +19,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.util.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.uni_hamburg.corpora.*;
 
 import org.exmaralda.partitureditor.jexmaralda.JexmaraldaException;
@@ -27,7 +30,7 @@ import org.xml.sax.SAXException;
 
 /**
  * @author bba1792 Dr. Herbert Lange
- * @version 20210701
+ * @version 20210708
  * Worker thread for the corpus checker
  */
 class CorpusThread extends Thread {
@@ -100,12 +103,22 @@ class CorpusThread extends Thread {
         logger.info("Done with all functions");
         report.addNote("CorpusService","Finished all tests");
         logger.info("Creating report");
+        // Get summary
+        HashMap<ReportItem.Severity,Integer> summary = CorpusServices.generateSummary(report);
+        // try to convert to JSON
+        String jsonSummary = "{}";
+        try {
+            jsonSummary = new ObjectMapper().writeValueAsString(summary);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         // Generate HTML report
         Collection<ReportItem> rawStatistics = report.getRawStatistics();
         String reportOutput = ReportItem.generateDataTableHTML(rawStatistics, report.getSummaryLines());
         // Alternative: Generate XML
         //XStream xstream = new XStream();
         //String reportOutput = xstream.toXML(rawStatistics);
+
         logger.info("Writing report");
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(outFile));
@@ -123,7 +136,7 @@ class CorpusThread extends Thread {
                         .queryParam("token", token)
                         .queryParam("output", outFile)
                         .request().header("Connection", "close")
-                        .buildGet()
+                        .buildPost(Entity.json(jsonSummary))
                         .invoke()
                         .close();
                 logger.info("Done with callback");
