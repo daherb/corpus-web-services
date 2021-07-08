@@ -56,7 +56,7 @@ public class CorpusServices {
     public static HashMap<ReportItem.Severity,Integer> generateSummary(Report report) {
         HashMap<ReportItem.Severity,Integer> results = new HashMap<>();
         for (ReportItem item : report.getRawStatistics()) {
-            results.compute(item.getSeverity(),(k,v) -> (v==null) ? 1 : v++) ;
+            results.compute(item.getSeverity(),(k,v) -> (v==null) ? 1 : v + 1) ;
         }
         return results;
     }
