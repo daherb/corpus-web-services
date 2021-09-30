@@ -6,7 +6,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 
@@ -58,20 +57,28 @@ public class Main {
     /**
      * Main method.
      * @param args No command line arguments expected
-     * @throws IOException Exception on server problems
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Main main = new Main();
         main.logger.info("Starting server");
         final HttpServer server = startServer();
-        System.out.println(String.format("Jersey app started with endpoints available at "
-                + "%s%nHit Ctrl-C to stop it...", BASE_URI));
-        System.in.read();
-        main.logger.info("Shutting down server");
-        server.shutdown();
+        System.out.printf("Jersey app started with endpoints available at "
+                + "%s%nHit Ctrl-C to stop it...%n", BASE_URI);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            main.logger.info("Shutting down server");
+            server.shutdown();
+            try {
+                Main.cleanupThreads();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }));
+        main.mainWait();
 
+    }
+    synchronized void mainWait() {
         try {
-            Main.cleanupThreads();
+            this.wait();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
