@@ -45,9 +45,15 @@ class CorpusThread extends Thread {
     String callbackUrl; // URL to be called when the task is done, giving an empty string means skipping the callback
 
     CorpusThread(String infile, String outfile, String functions, String token, String callbackUrl) {
-        this.inFile = infile;
+        if (infile.equals("tmp"))
+            this.inFile = System.getProperty("java.io.tmpdir") + "/corpus-files";
+        else
+            this.inFile = infile;
         this.functionNames = functions ;
-        this.outFile = outfile;
+        if (outfile.equals("tmp"))
+          this.outFile = this.inFile + "/report.html";
+        else
+            this.outFile = outfile;
         this.token = token ;
         this.callbackUrl = callbackUrl ;
     }
