@@ -11,56 +11,60 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author bba1792 Dr. Herbert Lange
- * @version 20210705
+ * @version 20211004
  * Resource to list corpus functions defined in the corpus services
+ * Scope: any
  */
 @Path("list_corpus_functions")
 public class ListCorpusFunctions {
     /**
+     * Class representing the relevant information for a corpus function, used to (de)serialize JSON
+     */
+    public static class CorpusFunctionInfo {
+        String name;
+        String description;
+        boolean available ;
+        Set<String> usableFor;
+
+        public CorpusFunctionInfo(String name, String description, boolean available, Set<String> usableFor) {
+            this.name = name;
+            this.description = description;
+            this.available = available;
+            this.usableFor = usableFor;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public boolean isAvailable() {
+            return available;
+        }
+
+        public Set<String> getUsableFor() {
+            return usableFor;
+        }
+    }
+    /**
      * Method handling HTTP GET requests. The returned object will be sent
-     * to the client as "text/plain" media type.
+     * to the client as "application/json" media type.
      *
-     * @return String that will be returned as a text/plain response.
+     * @return JSON response containing the list of corpus functions or HTTP error code 400
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listFunctions() {
-        ArrayList<Map<String,String>> functionList = new ArrayList<>() ;
-        for (String s : CorpusServices.getCorpusFunctions()) {
-            String function, description;
-            boolean available ;
-            try {
-                CorpusFunction cf = (CorpusFunction) Class.forName(s).getDeclaredConstructor().newInstance();
-                function = cf.getFunction();
-                try {
-                    description = cf.getDescription();
-                    available = true ;
-                } catch (Exception e) {
-                    description = "Error reading description" ;
-                    available = false ;
-                }
-            } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                function = s ;
-                description = "Error loading class" ;
-                available = false ;
-            }
-            HashMap<String,String> functionInfo = new HashMap<>();
-            functionInfo.put("name", function);
-            functionInfo.put("description",description);
-            functionInfo.put("available",Boolean.toString(available));
-
-            functionList.add(functionInfo);
-        }
-        // Sort the list by name
-        functionList.sort(Comparator.comparing((x) -> x.get("name")));
+    public Response getCorpusFunctions() {
         // Convert to JSON
+        ArrayList<CorpusFunctionInfo> functionList = listFunctions();
         ObjectMapper mapper = new ObjectMapper();
         try {
             String json = mapper.writeValueAsString(functionList);
@@ -70,5 +74,44 @@ public class ListCorpusFunctions {
         catch (JsonProcessingException e) {
             return Response.status(400).entity(new JsonObject().toString()).build();
         }
+    }
+
+
+    /**
+     * Gets the list of all corpus functions available in corpus services
+     *
+     * @return list of CorpusFunctionInfo objects representing the functions
+     */
+    public ArrayList<CorpusFunctionInfo> listFunctions() {
+
+        ArrayList<CorpusFunctionInfo> functionList = new ArrayList<>();
+        for (String s : CorpusServices.getCorpusFunctions()) {
+            String function, description;
+            Set<String> usableClasses = new HashSet<>();
+            boolean available;
+            try {
+                // Create the corpus function object using reflections and get its information
+                CorpusFunction cf = (CorpusFunction) Class.forName(s).getDeclaredConstructor().newInstance();
+                function = cf.getFunction();
+                usableClasses.addAll(cf.getIsUsableFor().stream().map(Class::getSimpleName).collect(Collectors.toSet()));
+                try {
+                    description = cf.getDescription();
+                    available = true;
+                } catch (Exception e) {
+                    description = "Error reading description";
+                    available = false;
+                }
+            } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+                function = s;
+                description = "Error loading class";
+                available = false;
+            }
+            // Create new info object and add it to the list
+            CorpusFunctionInfo functionInfo = new CorpusFunctionInfo(function, description, available, usableClasses);
+            functionList.add(functionInfo);
+        }
+        // Sort the list by name
+        functionList.sort(Comparator.comparing(CorpusFunctionInfo::getName));
+        return functionList;
     }
 }
