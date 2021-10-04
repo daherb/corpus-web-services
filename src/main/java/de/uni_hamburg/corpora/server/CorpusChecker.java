@@ -177,32 +177,6 @@ public class CorpusChecker {
                               @QueryParam("functions") String functions,
                               @QueryParam("token") String token,
                               @QueryParam("callback") String callbackUrl) {
-        //String defaultInfile = "/home/herb/projects/code/hamburg/testcorpora/exmeralda/MEDIA-TEST-BATTERY" ;
-        //String defaultInfile = "/home/herb/projects/code/hamburg/testcorpora/exmeralda/hmat" ;
-        //String defaultOutfile = "/tmp/MEDIA-TEST-BATTERY.html" ;
-        //String defaultOutfile = "/tmp/hmat.html" ;
-        //String defaultToken = "0xdeadbeef";
-        //String defaultCallbackUrl = "http://localhost:8081/callback";
-        //String defaultFunctions = "";
-        //defaultFunctions += "ExbTimelineChecker" ; // Does not seem to exist
-        //defaultFunctions += ",ExbFileReferenceChecker" ;
-        //defaultFunctions += ",ExbFileCoverageChecker" ;
-        //defaultFunctions += ",ExbStructureChecker" ;
-        //defaultFunctions += ",RemoveAutoSaveExb"; // heap error with raw statistics
-        //defaultFunctions += ",ExbTierDisplayNameChecker";
-        //defaultFunctions += ",IAAFunctionality" ;
-        //defaultFunctions += ",ExbEventLinebreaksChecker" ;
-        //defaultFunctions += ",ExbSegmentationChecker" ;
-        //defaultFunctions += ",RemoveEmptyEvents" ; // weird references in error statistics
-        //defaultFunctions += ",ExbMP3Next2WavAdder" ;
-        //defaultFunctions += ",ExbRefTierChecker" ;
-        //defaultFunctions += ",ExbScriptMixChecker" ;
-        //defaultFunctions += ",RemoveAbsolutePaths"; // heap error with raw statistics
-        //defaultFunctions += ",XSLTChecker" ;
-        //defaultFunctions += ",CorpusDataRegexReplacer" ;
-        //defaultFunctions += ",NullChecker" ;
-        //defaultFunctions += ",ExbLangCodes" ;
-        //String defaultFunctions = "NullChecker" ;
         boolean error = false ;
         ArrayList<String> missing = new ArrayList<>();
         if (input == null) {
