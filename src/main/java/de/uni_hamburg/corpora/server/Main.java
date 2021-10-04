@@ -6,7 +6,10 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+import java.awt.*;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import org.apache.velocity.app.Velocity;
@@ -72,6 +75,17 @@ public class Main {
                 "resource.loader.classpath.class",
                 "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
         Velocity.init();
+        // try to open url in browser
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            try {
+                Desktop.getDesktop().browse(new URI(BASE_URI));
+            } catch (IOException | URISyntaxException e) {
+                main.logger.info("Problem opening URI");
+            }
+        }
+        else {
+            main.logger.info("Problem opening browser");
+        }
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             main.logger.info("Shutting down server");
             server.shutdown();
