@@ -37,7 +37,7 @@ class CorpusThread extends Thread {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-    Report report = new Report();
+    de.uni_hamburg.corpora.Report report = new de.uni_hamburg.corpora.Report();
     String inFile ;
     String functionNames;
     String outFile;
@@ -97,7 +97,7 @@ class CorpusThread extends Thread {
             for (CorpusFunction f : functions) {
                 logger.warn("Running function {}", f.getFunction());
                 report.addNote("CorpusService", "Run test " + f.getFunction());
-                Report result = f.execute(corpus);
+                de.uni_hamburg.corpora.Report result = f.execute(corpus);
                 report.merge(result);
                 report.addNote("CorpusService", "Finish test " + f.getFunction());
                 logger.warn("Done with function {}", f.getFunction());
