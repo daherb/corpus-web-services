@@ -86,6 +86,7 @@ public class Main {
         else {
             main.logger.info("Problem opening browser");
         }
+        // Add proper shutdown when server is exited
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             main.logger.info("Shutting down server");
             server.shutdown();
