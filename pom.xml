@@ -48,7 +48,7 @@
         <groupId>de.uni_hamburg.corpora</groupId>
         <artifactId>corpus-services</artifactId>
         <version>1.0</version>
-	<type>jar</type>
+	    <type>jar</type>
       </dependency>
       <dependency>
         <groupId>org.jdom</groupId>
