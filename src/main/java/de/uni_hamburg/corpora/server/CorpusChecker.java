@@ -205,7 +205,7 @@ public class CorpusChecker {
             //callbackUrl = defaultCallbackUrl ;
         }
         if (error) {
-            String errorMsg = "Missing parameters: " + missing.stream().reduce((s1, s2) -> s1 + ", " + s2).get();
+            String errorMsg = "Missing parameters: " + String.join(", ", missing);
             logger.error(errorMsg);
             return Response.status(400).entity("400 - " + errorMsg).build();
         }
