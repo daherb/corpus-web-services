@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import java.net.URI;
 import java.util.ArrayList;
 
+import org.apache.velocity.app.Velocity;
+
 /**
  * @author bba1792 Dr. Herbert Lange
  * @version 20210701
@@ -64,6 +66,12 @@ public class Main {
         final HttpServer server = startServer();
         System.out.printf("Jersey app started with endpoints available at "
                 + "%s%nHit Ctrl-C to stop it...%n", BASE_URI);
+        // initialize the template engine
+        Velocity.setProperty(Velocity.RESOURCE_LOADERS, "classpath");
+        Velocity.addProperty(
+                "resource.loader.classpath.class",
+                "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        Velocity.init();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             main.logger.info("Shutting down server");
             server.shutdown();
