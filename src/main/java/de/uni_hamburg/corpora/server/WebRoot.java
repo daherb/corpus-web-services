@@ -12,8 +12,13 @@ import org.apache.velocity.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Arrays;
 
 /**
  * /**
@@ -35,14 +40,28 @@ public class WebRoot {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response getRoot() {
-        ClassLoader cl = this.getClass().getClassLoader();
-        URL res = this.getClass().getClassLoader().getResource("templates/root.vm");
-        if (res == null)
+        try {
+            //putStream template = this.getClass().getModule().getResourceAsStream("templates/root.vm");
+//            logger.info("Test: " + new String(this.getClass().getModule().getResourceAsStream("templates/root.vm")
+//            .readAllBytes()) + " # ");
+            StringWriter result = new StringWriter();
+            VelocityContext context = new VelocityContext();
+            context.put("functions", new ListCorpusFunctions().listFunctions());
+            Velocity.evaluate(context,result,"webroot",new String(this.getClass().getModule()
+                    .getResourceAsStream("templates/root.vm").readAllBytes()));
+            return Response.ok(result.toString()).build() ;
+        } catch (IOException e) {
+            logger.info("Got exception " + e);
             return Response.status(500,"Template not found").build();
-        StringWriter result = new StringWriter();
-        VelocityContext context = new VelocityContext();
-        context.put("functions", new ListCorpusFunctions().listFunctions());
-        Velocity.mergeTemplate("templates/root.vm", "UTF-8",context,result) ;
-        return Response.ok(result.toString()).build() ;
+        }
+//        URL res = this.getClass().getClassLoader().getResource("templates/root.vm");
+        //URL res = this.getClass().getResource("template/root.vm");
+        //if (res == null)
+        //    return Response.status(500,"Template not found").build();
+//        StringWriter result = new StringWriter();
+//        VelocityContext context = new VelocityContext();
+//        context.put("functions", new ListCorpusFunctions().listFunctions());
+//        Velocity.mergeTemplate("templates/root.vm", "UTF-8",context,result) ;
+//        return Response.ok(result.toString()).build() ;
     }
 }

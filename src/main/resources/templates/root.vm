@@ -1,0 +1,83 @@
+<html>
+<head>
+<script src="static/bootstrap.js"></script>
+<script src="static/jquery-3.6.0.min.js"></script>
+<script src="static/main.js"></script>
+<link rel="stylesheet" href="static/main.css" as="style" type="text/css">
+<link rel="stylesheet" href="static/bootstrap.css" as="style" type="text/css">
+</head>
+<body>
+<h1>Corpus services</h1>
+<div class="col lg">
+  <div class="row">
+    <input type="file" class="form-control" id="corpus-files" webkitdirectory mozdirectory msdirectory odirectory
+  directory>
+  </div>
+  <div class="row">
+    <input type="text" id="file-exts" value="txt">
+  </div>
+  <div class="row">
+    <a href="#" class="btn btn-primary" id="send-files">Send files and check data</a>
+  </div>
+  <form id="corpus_checker_form" method="post" action="">
+  <div class="accordion" id="corpus_functions">
+    #foreach ($function in $functions)
+      #if ($function.available)
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading_$function.name">
+          <div class="row">
+            <div class="col">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#collapse_$function.name"
+              aria-expanded="false" aria-controls="collapse_$function.name">
+                $function.name
+            </button>
+            </div>
+            <div class="col">
+            <input type="checkbox" class="form-check-input" id="validator_$function.name" value="$function.name">
+            </input>
+            </div>
+          </div>
+        </h2>
+        <div id="collapse_$function.name" class="accordion-collapse collapse" aria-labelledby="heading_$function.name"
+          data-bs-parent="#corpus_functions">
+          <div class="accordion-body">
+            Description: $function.description<br>
+            Usable for: $function.usableForString<br>
+            #if($function.paramsString)
+            Parameters:<br>
+            $function.paramsString
+            #end
+          </div>
+        </div>
+      </div>
+      #end
+    #end
+  </div>
+  </form>
+</div>
+
+
+<div class="modal" tabindex="-1" id="check_in_progress_dialogue">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Check in progress</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Check in progress. Results will soon be available here: <a href="report">Report</a></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>

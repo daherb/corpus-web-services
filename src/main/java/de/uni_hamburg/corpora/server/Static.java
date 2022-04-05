@@ -4,12 +4,15 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -32,20 +35,31 @@ public class Static {
     @GET
     public Response getStatic(@PathParam("staticFile") String fileName) {
         logger.info("Loading file " + fileName);
-        // Get file from resource
-        URL resource = this.getClass().getClassLoader().getResource("static/"+ fileName);
-        if (resource == null) {
-            logger.info("Resource is null");
-            return Response.status(404,"Invalid static file").build();
+//        // Get file from resource
+//        URL resource = this.getClass().getClassLoader().getResource("static/"+ fileName);
+//        if (resource == null) {
+//            logger.info("Resource is null");
+//            return Response.status(404,"Invalid static file").build();
+//        }
+//        else {
+//            try {
+//                logger.info("Resource is " + resource.toURI());
+//                File staticFile = new File(resource.toURI());
+//                return Response.ok(new FileInputStream(staticFile),Files.probeContentType(staticFile.toPath())).build();
+//            } catch (URISyntaxException | IOException e) {
+//                return Response.status(500, "Error loading file").build();
+//            }
+//        }
+        StringWriter result = new StringWriter();
+        VelocityContext context = new VelocityContext();
+//        Velocity.mergeTemplate("static/" + fileName, "UTF-8",context,result) ;
+//        return Response.ok(result.toString()).build() ;
+        //return Response.ok(Velocity.getTemplate("static/" + fileName).toString()).build();
+        try {
+            return Response.ok(this.getClass().getModule().getResourceAsStream("static/" + fileName).readAllBytes()).build();
         }
-        else {
-            try {
-                File staticFile = new File(resource.toURI());
-                logger.info("Resource is " + resource.toURI());
-                return Response.ok(new FileInputStream(staticFile),Files.probeContentType(staticFile.toPath())).build();
-            } catch (URISyntaxException | IOException e) {
-                return Response.status(500, "Error loading file").build();
-            }
+        catch (IOException e) {
+            return Response.status(500, "Error loading resource").build();
         }
     }
 }
