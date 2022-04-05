@@ -76,11 +76,10 @@ class CorpusThread extends Thread {
                 // Indicator if we encountered the function
                 boolean found = false ;
                 for (String canonical : allFunctions) {
-                    if (canonical.toLowerCase(Locale.ROOT).contains(function.toLowerCase(Locale.ROOT))) {
+                    if (canonical.toLowerCase(Locale.ROOT).endsWith("." + function.toLowerCase(Locale.ROOT))) {
                         // Create an object from canonical name. calls the constructor with thr constructor setting hasfixingoption to false
                         try {
-                            // functions.add((CorpusFunction) Class.forName(canonical).getDeclaredConstructor(boolean.class).newInstance(false));
-                            functions.add((CorpusFunction) Class.forName(canonical).getDeclaredConstructor(Properties.class).newInstance());
+                            functions.add((CorpusFunction) Class.forName(canonical).getDeclaredConstructor(Properties.class).newInstance(props));
                             found = true ;
                         }
                         catch (IllegalArgumentException | NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
