@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author bba1792 Dr. Herbert Lange
- * @version 20211004
+ * @version 20220405
  * Resource to list corpus functions defined in the corpus services
  * Scope: any
  */
@@ -30,12 +30,15 @@ public class ListCorpusFunctions {
         String description;
         boolean available ;
         Set<String> usableFor;
+        Map<String,String> params;
 
-        public CorpusFunctionInfo(String name, String description, boolean available, Set<String> usableFor) {
+        public CorpusFunctionInfo(String name, String description, boolean available, Set<String> usableFor,
+                                  Map<String,String> params) {
             this.name = name;
             this.description = description;
             this.available = available;
             this.usableFor = usableFor;
+            this.params = params ;
         }
 
         public String getName() {
@@ -52,6 +55,15 @@ public class ListCorpusFunctions {
 
         public Set<String> getUsableFor() {
             return usableFor;
+        }
+
+        public String getUsableForString() { return String.join(", ", usableFor); }
+
+        public Map<String,String> getParams() { return params; }
+
+        public String getParamsString() {
+            return params.keySet().stream().map((k) -> k + ": " + params.get(k))
+                    .collect(Collectors.joining("<br>\n"));
         }
     }
     /**
@@ -88,12 +100,15 @@ public class ListCorpusFunctions {
         for (String s : CorpusServices.getCorpusFunctions()) {
             String function, description;
             Set<String> usableClasses = new HashSet<>();
+            Map<String,String> params = new HashMap<>();
             boolean available;
             try {
                 // Create the corpus function object using reflections and get its information
-                CorpusFunction cf = (CorpusFunction) Class.forName(s).getDeclaredConstructor().newInstance();
+                CorpusFunction cf =
+                        (CorpusFunction) Class.forName(s).getDeclaredConstructor(Properties.class).newInstance(new Properties());
                 function = cf.getFunction();
                 usableClasses.addAll(cf.getIsUsableFor().stream().map(Class::getSimpleName).collect(Collectors.toSet()));
+                params.putAll(cf.getParameters());
                 try {
                     description = cf.getDescription();
                     available = true;
@@ -107,7 +122,8 @@ public class ListCorpusFunctions {
                 available = false;
             }
             // Create new info object and add it to the list
-            CorpusFunctionInfo functionInfo = new CorpusFunctionInfo(function, description, available, usableClasses);
+            CorpusFunctionInfo functionInfo = new CorpusFunctionInfo(function, description, available, usableClasses,
+                    params);
             functionList.add(functionInfo);
         }
         // Sort the list by name

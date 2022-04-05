@@ -41,15 +41,18 @@ class CorpusThread extends Thread {
     String inFile ;
     String functionNames;
     String outFile;
+    Properties props; // The properties for the function calls
     String token; // Identifier to be sent back to the server to identify and authorize task
     String callbackUrl; // URL to be called when the task is done, giving an empty string means skipping the callback
 
-    CorpusThread(String infile, String outfile, String functions, String token, String callbackUrl) {
+    CorpusThread(String infile, String outfile, String functions, Properties properties, String token,
+                 String callbackUrl) {
         if (infile.equals("tmp"))
             this.inFile = System.getProperty("java.io.tmpdir") + "/corpus-files";
         else
             this.inFile = infile;
         this.functionNames = functions ;
+        this.props = properties;
         if (outfile.equals("tmp"))
           this.outFile = this.inFile + "/report.html";
         else
@@ -77,7 +80,7 @@ class CorpusThread extends Thread {
                         // Create an object from canonical name. calls the constructor with thr constructor setting hasfixingoption to false
                         try {
                             // functions.add((CorpusFunction) Class.forName(canonical).getDeclaredConstructor(boolean.class).newInstance(false));
-                            functions.add((CorpusFunction) Class.forName(canonical).getDeclaredConstructor().newInstance());
+                            functions.add((CorpusFunction) Class.forName(canonical).getDeclaredConstructor(Properties.class).newInstance());
                             found = true ;
                         }
                         catch (IllegalArgumentException | NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
@@ -181,6 +184,7 @@ public class CorpusChecker {
     public Response checkCorpus(@QueryParam("input") String input,
                               @QueryParam("output") String output,
                               @QueryParam("functions") String functions,
+                              @QueryParam("params") String paramStr,
                               @QueryParam("token") String token,
                               @QueryParam("callback") String callbackUrl) {
         boolean error = false ;
@@ -215,7 +219,12 @@ public class CorpusChecker {
             logger.error(errorMsg);
             return Response.status(400).entity("400 - " + errorMsg).build();
         }
-        CorpusThread ct = new CorpusThread(input,output,functions,token,callbackUrl);
+        Properties params = new Properties();
+        if (paramStr != null) {
+            ObjectMapper mapper = new ObjectMapper();
+            params.putAll(mapper.convertValue(paramStr,Map.class));
+        }
+        CorpusThread ct = new CorpusThread(input,output,functions,params,token,callbackUrl);
         ct.start();
         Main.addThread(ct);
         return Response.ok().entity("Executing " + functions + " on " + input +
