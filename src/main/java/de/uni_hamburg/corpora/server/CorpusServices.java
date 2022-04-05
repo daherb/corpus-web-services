@@ -7,7 +7,6 @@ import de.uni_hamburg.corpora.ReportItem;
 import org.reflections.Reflections;
 
 import java.lang.reflect.Modifier;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,8 +14,8 @@ import java.util.stream.Collectors;
 
 /**
  * @author bba1792 Dr. Herbert Lange
- * @version 20210708
- * Class encapsulating some of the corpus services functionality
+ * @version 20220404
+ * Class encapsulating some corpus services functionality
  */
 public class CorpusServices {
     /**
@@ -29,7 +28,10 @@ public class CorpusServices {
         Reflections reflections = new Reflections("de.uni_hamburg.corpora");
         Set<Class<? extends CorpusFunction>> classes = reflections.getSubTypesOf(CorpusFunction.class);
         // Convert classes to class names
-        return classes.stream().filter((c) -> !Modifier.isAbstract(c.getModifiers())).map(Class::getCanonicalName).collect(Collectors.toSet());
+        return classes.stream()
+                .filter((c) -> Modifier.isPublic(c.getModifiers()) && !Modifier.isAbstract(c.getModifiers()))
+                .map(Class::getCanonicalName)
+                .collect(Collectors.toSet());
     }
 
     /**

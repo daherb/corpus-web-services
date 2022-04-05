@@ -68,7 +68,7 @@ class CorpusThread extends Thread {
 
         try {
             // Create corpus from given input file/folder
-            Corpus corpus = new Corpus(cio.read(new File(inFile).toURI().toURL())) ;
+            Corpus corpus = new Corpus(cio.read(new File(inFile).toURI().toURL(),report)) ;
             logger.info("Loaded " + corpus.getCorpusData().size() + " corpus files");
             // For all functions to be applied, get their canonical name and create an object for them
             Set<CorpusFunction> functions = new HashSet<>() ;
@@ -123,7 +123,8 @@ class CorpusThread extends Thread {
         }
         // Generate HTML report
         Collection<ReportItem> rawStatistics = report.getRawStatistics();
-        String reportOutput = ReportItem.generateDataTableHTML(rawStatistics, report.getSummaryLines());
+        String reportOutput = ReportItem.generateDataTableHTML(new ArrayList<>(rawStatistics),
+                report.getSummaryLines());
         // Alternative: Generate XML
         //XStream xstream = new XStream();
         //String reportOutput = xstream.toXML(rawStatistics);
