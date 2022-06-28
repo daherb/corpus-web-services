@@ -24,7 +24,6 @@ public class Favicon {
     @GET
     @Produces({"image/x-icon"})
     public Response getFavicon() {
-        logger.info("Here");
         return Response.ok().build() ;
     }
 }
