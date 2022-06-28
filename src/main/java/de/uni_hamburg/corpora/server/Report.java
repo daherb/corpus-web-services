@@ -2,6 +2,7 @@ package de.uni_hamburg.corpora.server;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +28,9 @@ public class Report {
      * @return Response containing the file or an error code
      */
     @GET
-    public Response getReport() {
-        String reportFileName = System.getProperty("java.io.tmpdir") + "/corpus-files/report.html";
+    public Response getReport(@QueryParam("token") String token) {
+        // TODO place report somewhere else because files should be deleted after check
+        String reportFileName = System.getProperty("java.io.tmpdir") + "/" + token + "/report.html";
         logger.info("Loading report file " + reportFileName);
         File reportFile = new File(reportFileName);
         if (!reportFile.exists()) {

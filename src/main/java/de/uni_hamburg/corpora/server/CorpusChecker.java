@@ -61,8 +61,13 @@ class CorpusThread extends Thread {
             this.inFile = infile;
         this.functionNames = functions ;
         this.props = properties;
-        if (outfile.equals("tmp"))
-          this.outFile = this.inFile + "/report.html";
+        if (outfile.equals("tmp")) {
+            File tmpDir = new File(System.getProperty("java.io.tmpdir") + "/" + token);
+            // Create parent directory if it is missing
+            if (!tmpDir.exists())
+                tmpDir.mkdirs();
+            this.outFile = System.getProperty("java.io.tmpdir") + "/" + token + "/report.html";
+        }
         else
             this.outFile = outfile;
         this.token = token ;
@@ -77,7 +82,6 @@ class CorpusThread extends Thread {
         CorpusIO cio = new CorpusIO();
         report.addNote("CorpusWebServices","Starting run at " +
                 DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(LocalDateTime.now()));
-
         try {
             // Create corpus from given input file/folder
             Corpus corpus;
