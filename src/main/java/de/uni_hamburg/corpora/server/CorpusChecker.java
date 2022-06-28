@@ -157,6 +157,12 @@ class CorpusThread extends Thread {
             e.printStackTrace();
         }
         logger.info("Done with report");
+        // cleanup corpus data
+        try {
+            FileUtils.deleteDirectory(new File(this.inFile));
+        } catch (IOException e) {
+            logger.info("Exception when deleting input directory");
+        }
         if (!callbackUrl.equals("")) {
             Client c = ClientBuilder.newClient();
             logger.info("Contacting callback");
