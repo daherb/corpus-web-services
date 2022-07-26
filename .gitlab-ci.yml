@@ -2,8 +2,8 @@ stages:          # List of stages for jobs, and their order of execution
   - deploy
 build-job:       # This job runs in the build stage, which runs first.
   stage: deploy
+  image: maven:latest
   script:
-    - apk add openjdk11-jre-headless
     - mvn compile assembly:single
   artifacts:
      name: "release"
