@@ -1,11 +1,11 @@
 stages:          # List of stages for jobs, and their order of execution
   - deploy
 build-job:       # This job runs in the build stage, which runs first.
-  stage: check
+  stage: deploy
   script:
     - apk add openjdk11-jre-headless
     - mvn compile assembly:single
   artifacts:
      name: "release"
-     path:
+     paths:
          - target/corpus-web-service-1.0-SNAPSHOT.jar
