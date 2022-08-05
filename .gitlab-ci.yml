@@ -1,0 +1,11 @@
+stages:          # List of stages for jobs, and their order of execution
+  - deploy
+build-job:       # This job runs in the build stage, which runs first.
+  stage: deploy
+  image: maven:latest
+  script:
+    - mvn compile assembly:single
+  artifacts:
+     name: "release"
+     paths:
+         - target/corpus-web-service-1.0-SNAPSHOT.jar
