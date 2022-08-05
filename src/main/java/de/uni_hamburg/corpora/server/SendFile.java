@@ -2,7 +2,6 @@ package de.uni_hamburg.corpora.server;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
@@ -12,9 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.file.Files;
 import java.util.Base64;
 
 /**
