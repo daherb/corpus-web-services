@@ -1,5 +1,6 @@
 <html>
 <head>
+<meta charset="UTF-8">
 <script src="static/bootstrap.js"></script>
 <script src="static/jquery-3.6.0.min.js"></script>
 <script src="static/main.js"></script>
@@ -9,12 +10,16 @@
 <body>
 <h1>Corpus services</h1>
 <div class="col lg">
+  <!-- Corpus selection -->
   <div class="row">
+    <label of="corpus-files">Corpus directory:</label>
     <input type="file" class="form-control" id="corpus-files" webkitdirectory mozdirectory msdirectory odirectory
   directory>
   </div>
+  <!-- Filtering by file extension -->
   <div class="row">
-    <input type="text" id="file-exts" value="txt">
+    <label of="file-exts">File filter (by file extensions):</label>
+    <input type="text" id="file-exts" value="*">
   </div>
   <div class="row">
     <a href="#" class="btn btn-primary" id="send-files">Send files and check data</a>
