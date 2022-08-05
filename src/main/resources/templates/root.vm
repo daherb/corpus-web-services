@@ -21,6 +21,11 @@
     <label of="file-exts">File filter (by file extensions):</label>
     <input type="text" id="file-exts" value="*">
   </div>
+  <!-- Config file selector -->
+  <!-- div class="row">
+      <label of="corpus-files">Configuration file:</label>
+      <input type="file" class="form-control" id="config-file" accept=".yaml">
+  </div -->
   <div class="row">
     <a href="#" class="btn btn-primary" id="send-files">Send files and check data</a>
   </div>
