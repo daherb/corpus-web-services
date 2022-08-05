@@ -28,7 +28,19 @@ public class Static {
     public Response getStatic(@PathParam("staticFile") String fileName) {
         logger.info("Loading file " + fileName);
         try {
-            return Response.ok(this.getClass().getModule().getResourceAsStream("static/" + fileName).readAllBytes()).build();
+            String type;
+            if (fileName.toLowerCase().endsWith("js")) {
+                type = "application/javascript";
+            }
+            else if (fileName.toLowerCase().endsWith("css")) {
+                type = "text/css";
+            }
+            else {
+                type = "application/octet-stream";
+            }
+            return Response.ok(this.getClass().getModule().getResourceAsStream("static/" + fileName).readAllBytes())
+                    .type(type)
+                    .build();
         }
         catch (IOException e) {
             return Response.status(500, "Error loading resource").build();
