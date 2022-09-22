@@ -16,9 +16,10 @@ var count;
 function do_the_sending(corpus_files,file_exts,resolve) {
   for (var i = 0 ; i <corpus_files.length; i++) {
     file_exts.forEach(function(e) {
-      if (corpus_files[i].name.endsWith(e)) {
+      if (corpus_files[i].name.endsWith(e.replace("\*.","")) || e == "*") {
         var reader = new FileReader();
         reader.addEventListener("load", ((name) => { return () => {
+          console.log("send file " + name)
           var content = reader.result;
           --count;
           $.ajax({
@@ -56,6 +57,7 @@ function send_files() {
     var functions = []
     $("#corpus_checker_form input:checked").each((index,element) => functions.push(element.value));
     var url = "check_corpus?input=tmp&output=tmp&functions=" + functions.join(",") + "&token=tmp&callback="
+    console.log("call url " + url)
     $.ajax({
       url: url,
       type: "GET",

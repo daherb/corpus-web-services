@@ -18,7 +18,8 @@
   </div>
   <!-- Filtering by file extension -->
   <div class="row">
-    <label of="file-exts">File filter (by file extensions):</label>
+    <label of="file-exts">File filter (by file extensions, comma-separated, either in the form exb or *.exb and *
+    matching everything):</label>
     <input type="text" id="file-exts" value="*">
   </div>
   <!-- Config file selector -->
