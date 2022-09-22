@@ -6,6 +6,7 @@ build-job:       # This job runs in the build stage, which runs first.
   script:
     - cd lib
     - bash install_corpus_services_jar.sh
+    - cd ..
     - mvn compile assembly:single
   artifacts:
      name: "release"
