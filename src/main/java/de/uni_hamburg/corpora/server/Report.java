@@ -30,6 +30,8 @@ public class Report {
     @GET
     public Response getReport(@QueryParam("token") String token) {
         // TODO place report somewhere else because files should be deleted after check
+        if (token == null)
+            token = "tmp";
         String reportFileName = System.getProperty("java.io.tmpdir") + "/" + token + "/report.html";
         logger.info("Loading report file " + reportFileName);
         File reportFile = new File(reportFileName);

@@ -20,6 +20,8 @@ import jakarta.ws.rs.core.Response;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -53,27 +55,34 @@ class CorpusThread extends Thread {
     String callbackUrl; // URL to be called when the task is done, giving an empty string means skipping the callback
 
     CorpusThread(String name, String infile, String outfile, String functions, Properties properties, String token,
-                 String callbackUrl) {
+                 String callbackUrl) throws IOException {
         this.corpusName=name;
-        if (infile.equals("tmp"))
-            this.inFile = System.getProperty("java.io.tmpdir") + "/corpus-files";
+        if (infile.equals("tmp")) {
+            if (System.getProperty("corpusDir") != null)
+                this.inFile = System.getProperty("corpusDir");
+            else
+                throw new IOException("Corpus files not ready");
+        }
         else
             this.inFile = infile;
         this.functionNames = functions ;
         this.props = properties;
+        this.token = Objects.requireNonNullElse(token, "tmp");
         if (outfile.equals("tmp")) {
-            File tmpDir = new File(System.getProperty("java.io.tmpdir") + "/" + token);
+            File logDir = Paths.get(System.getProperty("java.io.tmpdir"),token).toFile();
             // Create parent directory if it is missing
-            if (!tmpDir.exists())
-                tmpDir.mkdirs();
-            this.outFile = System.getProperty("java.io.tmpdir") + "/" + token + "/report.html";
+            if (!logDir.exists())
+                if (!logDir.mkdirs())
+                    throw new IOException("Failed to create folders "+ logDir);
+            this.outFile = Paths.get(logDir.toString(), "report.html").toString();
         }
         else
             this.outFile = outfile;
-        this.token = token ;
+
         this.callbackUrl = callbackUrl ;
         logger.info("Input: " + this.inFile + " output: " + this.outFile + " functions: " + functions + " params: " +
                 this.props + " token: " + this.token + " callback: " + this.callbackUrl);
+
     }
 
     public void run() {
@@ -152,6 +161,13 @@ class CorpusThread extends Thread {
         //XStream xstream = new XStream();
         //String reportOutput = xstream.toXML(rawStatistics);
 
+        // Cleanup folder
+        try {
+            FileUtils.deleteDirectory(new File(inFile));
+            System.getProperties().remove("corpusDir");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         logger.info("Writing report");
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(outFile));
@@ -217,7 +233,7 @@ public class CorpusChecker {
                                 @QueryParam("functions") String functions,
                                 @QueryParam("params") String paramStr,
                                 @QueryParam("token") String token,
-                                @QueryParam("callback") String callbackUrl) {
+                                @QueryParam("callback") String callbackUrl) throws IOException {
         boolean error = false ;
         ArrayList<String> missing = new ArrayList<>();
         if (input == null) {

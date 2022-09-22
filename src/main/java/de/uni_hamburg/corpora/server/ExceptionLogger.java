@@ -20,9 +20,10 @@ public class ExceptionLogger implements ExceptionMapper<Exception> {
 
     @Override
     public Response toResponse(Exception e) {
-        log.severe("Exception:" + e);
+        //log.severe("Exception:" + e);
         StringWriter sw = new StringWriter();
         e.printStackTrace(new PrintWriter(sw));
+        log.severe("Exception:" + e + "\n" + sw);
         return Response.status(500).entity(sw.toString()).build();
     }
 }

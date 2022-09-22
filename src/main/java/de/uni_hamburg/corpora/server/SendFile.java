@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Base64;
 
 /**
@@ -63,29 +63,44 @@ public class SendFile {
      */
     @POST
     public Response getFile(String fileData) {
-        // New folder in temp
-        String corpusDirStr = System.getProperty("java.io.tmpdir") + "/corpus-files";
-        File corpusDir = new File(corpusDirStr);
-        // Create if folder is missing
-        if (!corpusDir.exists())
-            corpusDir.mkdirs();
         try {
+            // New folder in temp
+            File corpusDir;
+            if (System.getProperty("corpusDir") == null) {
+                corpusDir = Files.createTempDirectory("corpus-files").toFile();
+                System.setProperty("corpusDir", corpusDir.toString());
+            }
+            else {
+                corpusDir = new File(System.getProperty("corpusDir"));
+            }
+
+            // Create if folder is missing
+//            if (!corpusDir.exists()) {
+//                if (!corpusDir.mkdirs()) {
+//                    throw new IOException("Failed to create directory " + corpusDir);
+//                }
+//            }
             // Parse json
             CorpusFile cf = new ObjectMapper().readerFor(CorpusFile.class).readValue(fileData);
             //logger.info("Got: " + cf);
             // Create a new file in temp folder and write the data we got
-            File file = new File(new URI(corpusDir.toURI() + "/" + cf.getName())) ;
+            File file = Paths.get(corpusDir.getPath(),cf.getName()).toFile();
+            logger.info("FILE: " + file);
             // Delete file if it already exists
-            if (file.exists())
-                file.delete();
-            if (!file.createNewFile()) throw new IOException("Cannot create file");
-            logger.info(String.valueOf(file.toURI()));
+            if (file.exists()) {
+                boolean deleted = file.delete();
+                if (!deleted)
+                    throw new IOException("Failed to delete file " + file);
+            }
+            if (!file.createNewFile()) throw new IOException("Failed to create file " + file);
             FileOutputStream fs = new FileOutputStream(file);
             fs.write(cf.getData());
             fs.close();
+//            logger.info("Wrote file " + file + ": " + file.exists());
+//            logger.info(Arrays.asList(corpusDir.listFiles()).toString());
             // Everything okay
             return Response.ok().build();
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             // On exception print error and return error code
             logger.error("Error reading " + fileData + ": " + e);
             e.printStackTrace();
