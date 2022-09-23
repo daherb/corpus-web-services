@@ -7,6 +7,7 @@ Java-based application to make calls to [Corpus Services](https://gitlab.rrz.uni
 Currently tested with
 - Java 11
 - Maven 3.8
+- Linux
 
 ## Build and run
 - cd lib
