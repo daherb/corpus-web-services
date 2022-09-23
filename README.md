@@ -13,3 +13,6 @@ Currently tested with
 - bash install_corpus_services_jar.sh
 - cd ..
 - mvn clean compile exec:java
+
+After these steps you can access a graphical web frontend by pointing your
+webbrowser to http://localhost:8080/
