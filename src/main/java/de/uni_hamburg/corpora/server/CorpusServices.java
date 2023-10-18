@@ -2,9 +2,11 @@ package de.uni_hamburg.corpora.server;
 
 import de.uni_hamburg.corpora.CorpusData;
 import de.uni_hamburg.corpora.CorpusFunction;
+import de.uni_hamburg.corpora.CorpusMagician;
 import de.uni_hamburg.corpora.Report;
 import de.uni_hamburg.corpora.ReportItem;
 import org.reflections.Reflections;
+import org.reflections.util.ConfigurationBuilder;
 
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -25,7 +27,7 @@ public class CorpusServices {
      */
     public static Set<String> getCorpusFunctions() {
         // Get all classes implementing the interface via reflections
-        Reflections reflections = new Reflections("de.uni_hamburg.corpora");
+        Reflections reflections = new Reflections(new ConfigurationBuilder().forPackages(CorpusMagician.corpusFunctionPackages));
         Set<Class<? extends CorpusFunction>> classes = reflections.getSubTypesOf(CorpusFunction.class);
         // Convert classes to class names
         return classes.stream()
