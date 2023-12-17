@@ -20,7 +20,7 @@ import jakarta.ws.rs.core.Response;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
+//import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,11 +29,13 @@ import java.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.uni_hamburg.corpora.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.exmaralda.partitureditor.jexmaralda.JexmaraldaException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -43,7 +45,8 @@ import org.xml.sax.SAXException;
  */
 class CorpusThread extends Thread {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+//    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+    private static final Logger logger = Logger.getLogger(CorpusThread.class.getName());
 
     de.uni_hamburg.corpora.Report report = new de.uni_hamburg.corpora.Report();
     String corpusName;
@@ -115,7 +118,8 @@ class CorpusThread extends Thread {
                             found = true ;
                         }
                         catch (IllegalArgumentException | NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
-                            logger.warn("Error creating {}", canonical);
+//                            logger.warn("Error creating {}", canonical);
+                            logger.warning("Error creating" + canonical);
                             report.addWarning("CorpusWebServices", "Test " + function + " cannot be created");
 //                            e.printStackTrace();
                         }
@@ -124,17 +128,17 @@ class CorpusThread extends Thread {
                 if (!found) {
                     // Warn if we could not find the function
                     report.addWarning("CorpusWebServices", "Test " + function + " is not available");
-                    logger.warn("Function {} is not available in corpus services", function);
+                    logger.log(Level.WARNING,"Function {} is not available in corpus services", function);
 
                 }
             }
             for (CorpusFunction f : functions) {
-                logger.warn("Running function {}", f.getFunction());
+                logger.log(Level.WARNING,"Running function {}", f.getFunction());
                 report.addNote("CorpusWebServices", "Run test " + f.getFunction());
                 de.uni_hamburg.corpora.Report result = f.execute(corpus);
                 report.merge(result);
                 report.addNote("CorpusWebServices", "Finish test " + f.getFunction());
-                logger.warn("Done with function {}", f.getFunction());
+                logger.log(Level.WARNING,"Done with function {}", f.getFunction());
             }
         } catch (URISyntaxException | ClassNotFoundException | IOException | SAXException | JexmaraldaException e) {
             e.printStackTrace();
@@ -197,7 +201,7 @@ class CorpusThread extends Thread {
                 logger.info("Done with callback");
             }
             catch (Exception e) {
-                logger.error("Failed contacting callback", e);
+                logger.log(Level.SEVERE,"Failed contacting callback", e);
             }
         }
 
@@ -212,7 +216,9 @@ class CorpusThread extends Thread {
 @Path("check_corpus")
 public class CorpusChecker {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+//    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+    private static final Logger logger = Logger.getLogger(CorpusChecker.class.getName());
+    
 
     public CorpusChecker() {
 
@@ -263,7 +269,7 @@ public class CorpusChecker {
         }
         if (error) {
             String errorMsg = "Missing parameters: " + String.join(", ", missing);
-            logger.error(errorMsg);
+            logger.log(Level.SEVERE,errorMsg);
             return Response.status(400).entity("400 - " + errorMsg).build();
         }
         Properties params = new Properties();

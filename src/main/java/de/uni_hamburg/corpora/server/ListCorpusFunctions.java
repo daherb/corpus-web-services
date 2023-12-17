@@ -2,7 +2,7 @@ package de.uni_hamburg.corpora.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonObject;
+//import com.google.gson.JsonObject;
 import de.uni_hamburg.corpora.CorpusFunction;
 
 import jakarta.ws.rs.GET;
@@ -72,21 +72,21 @@ public class ListCorpusFunctions {
      *
      * @return JSON response containing the list of corpus functions or HTTP error code 400
      */
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getCorpusFunctions() {
-        // Convert to JSON
-        ArrayList<CorpusFunctionInfo> functionList = listFunctions();
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            String json = mapper.writeValueAsString(functionList);
-            return Response.ok().entity(json).build() ;
-        }
-        // On error return empty JSON and an error code
-        catch (JsonProcessingException e) {
-            return Response.status(400).entity(new JsonObject().toString()).build();
-        }
-    }
+//    @GET
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public Response getCorpusFunctions() {
+//        // Convert to JSON
+//        ArrayList<CorpusFunctionInfo> functionList = listFunctions();
+//        ObjectMapper mapper = new ObjectMapper();
+//        try {
+//            String json = mapper.writeValueAsString(functionList);
+//            return Response.ok().entity(json).build() ;
+//        }
+//        // On error return empty JSON and an error code
+//        catch (JsonProcessingException e) {
+//            return Response.status(400).entity(new JsonObject().toString()).build();
+//        }
+//    }
 
 
     /**

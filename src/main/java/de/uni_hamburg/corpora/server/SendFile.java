@@ -5,13 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.logging.Logger;
 
 /**
  * @author bba1792 Dr. Herbert Lange
@@ -54,7 +55,9 @@ public class SendFile {
             return data;
         }
     }
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+//    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+    private static final Logger logger = Logger.getLogger(SendFile.class.getName());
+    
     /**
      * Accepts files sent via post and data-url-encoded. Only for local use because we don't avoid potential
      * conflicts with parallel uploads!
@@ -102,7 +105,8 @@ public class SendFile {
             return Response.ok().build();
         } catch (IOException e) {
             // On exception print error and return error code
-            logger.error("Error reading " + fileData + ": " + e);
+//            logger.error("Error reading " + fileData + ": " + e);
+            logger.severe("Error reading " + fileData + ": " + e);
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),e.toString()).build();
         }

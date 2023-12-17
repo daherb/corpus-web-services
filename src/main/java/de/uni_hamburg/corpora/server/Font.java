@@ -4,10 +4,11 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * @author bba1792 Dr. Herbert Lange
@@ -17,13 +18,9 @@ import java.io.IOException;
 @Path("/fonts/{staticFile}")
 public class Font {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-    /**
-     * Method handling HTTP GET requests for font files. The returned object will be sent
-     * to the client
-     *
-     * @return Response containing the file or an error code
-     */
+//    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+    private static final Logger logger = Logger.getLogger(Font.class.getName());
+
     @GET
     public Response getStatic(@PathParam("staticFile") String fileName) {
         logger.info("Loading file " + fileName);
