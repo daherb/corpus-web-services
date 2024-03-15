@@ -1,11 +1,11 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<script src="static/bootstrap.js"></script>
+<script src="static/bootstrap-5.1.1-dist/js/bootstrap.js"></script>
 <script src="static/jquery-3.6.0.min.js"></script>
 <script src="static/main.js"></script>
 <link rel="stylesheet" href="static/main.css" as="style" type="text/css">
-<link rel="stylesheet" href="static/bootstrap.css" as="style" type="text/css">
+<link rel="stylesheet" href="static/bootstrap-5.1.1-dist/css/bootstrap.css" as="style" type="text/css">
 <link rel="shortcut icon" type="image/png" href="static/favicon.png">
 </head>
 <body>
