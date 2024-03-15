@@ -2,17 +2,14 @@ package de.uni_hamburg.corpora.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.google.gson.JsonObject;
 import de.uni_hamburg.corpora.CorpusFunction;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author bba1792 Dr. Herbert Lange
@@ -20,7 +17,7 @@ import java.util.stream.Collectors;
  * Resource to list corpus functions defined in the corpus services
  * Scope: any
  */
-@Path("list_corpus_functions")
+@RestController
 public class ListCorpusFunctions {
     /**
      * Class representing the relevant information for a corpus function, used to (de)serialize JSON
@@ -72,21 +69,20 @@ public class ListCorpusFunctions {
      *
      * @return JSON response containing the list of corpus functions or HTTP error code 400
      */
-//    @GET
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response getCorpusFunctions() {
-//        // Convert to JSON
-//        ArrayList<CorpusFunctionInfo> functionList = listFunctions();
-//        ObjectMapper mapper = new ObjectMapper();
-//        try {
-//            String json = mapper.writeValueAsString(functionList);
-//            return Response.ok().entity(json).build() ;
-//        }
-//        // On error return empty JSON and an error code
-//        catch (JsonProcessingException e) {
-//            return Response.status(400).entity(new JsonObject().toString()).build();
-//        }
-//    }
+    @GetMapping(value = "list_corpus_functions")
+    public ResponseEntity<String> getCorpusFunctions() {
+        // Convert to JSON
+        ArrayList<CorpusFunctionInfo> functionList = listFunctions();
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(functionList);
+            return new ResponseEntity<>(json, HttpStatus.OK);
+        }
+        // On error return empty JSON and an error code
+        catch (JsonProcessingException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 
     /**

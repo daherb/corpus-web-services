@@ -8,22 +8,27 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Logger;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
 /**
  * @author bba1792 Dr. Herbert Lange
  * @version 20210701
  * The Exception handler logging exceptions.
  */
-@Provider
-public class ExceptionLogger implements ExceptionMapper<Exception> {
+@ControllerAdvice
+public class ExceptionLogger {
 
     private static final Logger log = Logger.getLogger("ExceptionLog");
 
-    @Override
-    public Response toResponse(Exception e) {
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> toResponse(Exception e) {
         //log.severe("Exception:" + e);
         StringWriter sw = new StringWriter();
         e.printStackTrace(new PrintWriter(sw));
         log.severe("Exception:" + e + "\n" + sw);
-        return Response.status(500).entity(sw.toString()).build();
+        return new ResponseEntity<>(sw.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
