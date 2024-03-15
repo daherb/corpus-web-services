@@ -29,8 +29,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.xml.sax.SAXException;
 
 /**
- * @author bba1792 Dr. Herbert Lange
- * @version 20220405
+ * @author Herbert Lange
+ * @version 20240315
  * Worker thread for the corpus checker
  */
 class CorpusThread extends Thread {

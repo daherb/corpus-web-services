@@ -5,8 +5,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * @author bba1792 Dr. Herbert Lange
- * @version 20210701
+ * @author Herbert Lange
+ * @version 20240315
  * Main class creating the web server and handling a list of threads
  */
 @SpringBootApplication

@@ -15,8 +15,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * @author bba1792 Dr. Herbert Lange
- * @version 20220404
+ * @author Herbert Lange
+ * @version 20240315
  * Class encapsulating some corpus services functionality
  */
 public class CorpusServices {

@@ -14,11 +14,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 
 /**
- * /**
- * @author bba1792 Dr. Herbert Lange
- * @version 20211004
+ * @author Herbert Lange
+ * @version 20240315
  * Root resource (exposed at "/" path)
- */
+ **/
 @RestController
 public class WebRoot {
 

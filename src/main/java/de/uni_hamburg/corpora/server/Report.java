@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author bba1792 Dr. Herbert Lange
- * @version 20211004
+ * @author Herbert Lange
+ * @version 20240315
  * Resource to show an existing local report
  * Scope: local
  */

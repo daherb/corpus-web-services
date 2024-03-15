@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 /**
- * @author bba1792 Dr. Herbert Lange
- * @version 20210701
+ * @author Herbert Lange
+ * @version 20240315
  * The Exception handler logging exceptions.
  */
 @ControllerAdvice

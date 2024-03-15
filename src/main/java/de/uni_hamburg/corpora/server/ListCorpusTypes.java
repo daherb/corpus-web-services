@@ -4,8 +4,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author bba1792 Dr. Herbert Lange
- * @version 20210701
+ * @author Herbert Lange
+ * @version 20240315
  * Resource to list corpus data types defined in the corpus services
  */
 @RestController

@@ -14,8 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
 /**
- * @author bba1792 Dr. Herbert Lange
- * @version 20220405
+ * @author Herbert Lange
+ * @version 20240315
  * Class handling font files
  */
 

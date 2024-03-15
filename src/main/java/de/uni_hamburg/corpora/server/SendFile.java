@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author bba1792 Dr. Herbert Lange
- * @version 20211004
+ * @author Herbert Lange
+ * @version 20240315
  * Class handling files sent to the server
  */
 @RestController

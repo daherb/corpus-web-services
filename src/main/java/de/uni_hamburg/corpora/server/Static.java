@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.MediaType;
 /**
- * @author bba1792 Dr. Herbert Lange
- * @version 20220405
+ * @author Herbert Lange
+ * @version 20240315
  * Class handling static files
  */
 @RestController

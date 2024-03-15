@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author bba1792 Dr. Herbert Lange
- * @version 20220405
+ * @author Herbert Lange
+ * @version 20240315
  * Resource to list corpus functions defined in the corpus services
  * Scope: any
  */
