@@ -3,22 +3,24 @@ package de.uni_hamburg.corpora.server;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.logging.Logger;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author bba1792 Dr. Herbert Lange
- * @version 20211004
+ * @author Herbert Lange
+ * @version 20240315
  * Class handling files sent to the server
  */
-@Path("/send")
+@RestController
 public class SendFile {
     public static class CorpusFile {
 
@@ -54,15 +56,17 @@ public class SendFile {
             return data;
         }
     }
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+//    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+    private static final Logger logger = Logger.getLogger(SendFile.class.getName());
+    
     /**
      * Accepts files sent via post and data-url-encoded. Only for local use because we don't avoid potential
      * conflicts with parallel uploads!
      *
      * @return Response containing the file or an error code
      */
-    @POST
-    public Response getFile(String fileData) {
+    @PostMapping("/send")
+    public ResponseEntity<String> getFile(@RequestBody String fileData) {
         try {
             // New folder in temp
             File corpusDir;
@@ -73,13 +77,6 @@ public class SendFile {
             else {
                 corpusDir = new File(System.getProperty("corpusDir"));
             }
-
-            // Create if folder is missing
-//            if (!corpusDir.exists()) {
-//                if (!corpusDir.mkdirs()) {
-//                    throw new IOException("Failed to create directory " + corpusDir);
-//                }
-//            }
             // Parse json
             CorpusFile cf = new ObjectMapper().readerFor(CorpusFile.class).readValue(fileData);
             //logger.info("Got: " + cf);
@@ -99,12 +96,11 @@ public class SendFile {
 //            logger.info("Wrote file " + file + ": " + file.exists());
 //            logger.info(Arrays.asList(corpusDir.listFiles()).toString());
             // Everything okay
-            return Response.ok().build();
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (IOException e) {
             // On exception print error and return error code
-            logger.error("Error reading " + fileData + ": " + e);
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),e.toString()).build();
+            logger.severe("Error reading " + fileData + ": " + e);
+            return new ResponseEntity<>(e.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
