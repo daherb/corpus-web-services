@@ -6,6 +6,7 @@
 <script src="static/main.js"></script>
 <link rel="stylesheet" href="static/main.css" as="style" type="text/css">
 <link rel="stylesheet" href="static/bootstrap.css" as="style" type="text/css">
+<link rel="shortcut icon" type="image/png" href="static/favicon.png">
 </head>
 <body>
 <h1>Corpus services</h1>
