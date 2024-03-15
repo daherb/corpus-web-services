@@ -28,7 +28,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Download depencencies
-      run: cd lib && bash install_corpus_services_jar.sh && cd ..
+      run: cd lib && bash download.sh && cd ..
     - name: Build with Maven
       run: ./mvnw clean test compile package
 
