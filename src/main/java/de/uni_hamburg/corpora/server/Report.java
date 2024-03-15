@@ -1,49 +1,47 @@
 package de.uni_hamburg.corpora.server;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
+import java.util.Optional;
+import java.util.logging.Logger;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author bba1792 Dr. Herbert Lange
- * @version 20211004
+ * @author Herbert Lange
+ * @version 20240315
  * Resource to show an existing local report
  * Scope: local
  */
-@Path("report")
+@RestController
 public class Report {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-    /**
-     * Method handling HTTP GET requests for the local report.
-     *
-     * @return Response containing the file or an error code
-     */
-    @GET
-    public Response getReport(@QueryParam("token") String token) {
+    private static final Logger logger = Logger.getLogger(Report.class.getName());
+    
+
+    @GetMapping("report")
+    public ResponseEntity<String> getReport(@RequestParam("token") Optional<String> token) {
         // TODO place report somewhere else because files should be deleted after check
-        if (token == null)
-            token = "tmp";
-        String reportFileName = System.getProperty("java.io.tmpdir") + "/" + token + "/report.html";
+        if (token.isEmpty())
+            token = Optional.of("tmp");
+        String reportFileName = System.getProperty("java.io.tmpdir") + "/" + token.get() + "/report.html";
         logger.info("Loading report file " + reportFileName);
         File reportFile = new File(reportFileName);
         if (!reportFile.exists()) {
             logger.info("Report is missing");
-            return Response.status(404,"Invalid report file").build();
+            return new ResponseEntity<>("Error loading file", HttpStatus.NOT_FOUND);
         }
         else {
-            try {
-                return Response.ok(new FileInputStream(reportFile), Files.probeContentType(reportFile.toPath())).build();
+            try (InputStream stream = new FileInputStream(reportFile)){
+            	return new ResponseEntity<>(new String(stream.readAllBytes()), HttpStatus.OK);
             } catch (IOException e) {
-                return Response.status(500, "Error loading file").build();
+            	return new ResponseEntity<>("Error loading file", HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
     }

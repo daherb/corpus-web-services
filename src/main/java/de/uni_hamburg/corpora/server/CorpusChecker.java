@@ -5,45 +5,38 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.Thread;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.uni_hamburg.corpora.*;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 import org.exmaralda.partitureditor.jexmaralda.JexmaraldaException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.xml.sax.SAXException;
 
 /**
- * @author bba1792 Dr. Herbert Lange
- * @version 20220405
+ * @author Herbert Lange
+ * @version 20240315
  * Worker thread for the corpus checker
  */
 class CorpusThread extends Thread {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+//    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+    private static final Logger logger = Logger.getLogger(CorpusThread.class.getName());
 
     de.uni_hamburg.corpora.Report report = new de.uni_hamburg.corpora.Report();
     String corpusName;
@@ -115,29 +108,29 @@ class CorpusThread extends Thread {
                             found = true ;
                         }
                         catch (IllegalArgumentException | NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
-                            logger.warn("Error creating {}", canonical);
+//                            logger.warn("Error creating {}", canonical);
+                            logger.warning("Error creating" + canonical);
                             report.addWarning("CorpusWebServices", "Test " + function + " cannot be created");
-//                            e.printStackTrace();
                         }
                     }
                 }
                 if (!found) {
                     // Warn if we could not find the function
                     report.addWarning("CorpusWebServices", "Test " + function + " is not available");
-                    logger.warn("Function {} is not available in corpus services", function);
+                    logger.log(Level.WARNING,"Function {} is not available in corpus services", function);
 
                 }
             }
             for (CorpusFunction f : functions) {
-                logger.warn("Running function {}", f.getFunction());
+                logger.log(Level.WARNING,"Running function {}", f.getFunction());
                 report.addNote("CorpusWebServices", "Run test " + f.getFunction());
                 de.uni_hamburg.corpora.Report result = f.execute(corpus);
                 report.merge(result);
                 report.addNote("CorpusWebServices", "Finish test " + f.getFunction());
-                logger.warn("Done with function {}", f.getFunction());
+                logger.log(Level.WARNING,"Done with function {}", f.getFunction());
             }
         } catch (URISyntaxException | ClassNotFoundException | IOException | SAXException | JexmaraldaException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         logger.info("Done with all functions");
@@ -146,13 +139,7 @@ class CorpusThread extends Thread {
         logger.info("Creating report");
         // Get summary
         HashMap<ReportItem.Severity,Integer> summary = CorpusServices.generateSummary(report);
-        // try to convert to JSON
-        String jsonSummary = "{}";
-        try {
-            jsonSummary = new ObjectMapper().writeValueAsString(summary);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+
         // Generate HTML report
         Collection<ReportItem> rawStatistics = report.getRawStatistics();
         String reportOutput = ReportItem.generateDataTableHTML(new ArrayList<>(rawStatistics),
@@ -166,7 +153,7 @@ class CorpusThread extends Thread {
             FileUtils.deleteDirectory(new File(inFile));
             System.getProperties().remove("corpusDir");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         logger.info("Writing report");
         try {
@@ -174,7 +161,7 @@ class CorpusThread extends Thread {
             out.write(reportOutput);
             out.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         logger.info("Done with report");
         // cleanup corpus data
@@ -183,21 +170,26 @@ class CorpusThread extends Thread {
         } catch (IOException e) {
             logger.info("Exception when deleting input directory");
         }
-        if (!callbackUrl.equals("")) {
-            Client c = ClientBuilder.newClient();
+        if (!callbackUrl.isEmpty()) {
+
+
             logger.info("Contacting callback");
             try {
-                c.target(callbackUrl)
-                        .queryParam("token", token)
-                        .queryParam("output", outFile)
-                        .request().header("Connection", "close")
-                        .buildPost(Entity.json(jsonSummary))
-                        .invoke()
-                        .close();
+                HashMap<String,String> variables = new HashMap<>();
+                variables.put("token", token);
+                variables.put("output", outFile);
+                WebClient.ResponseSpec response = WebClient.builder()
+                        .baseUrl(callbackUrl)
+                        .defaultUriVariables(variables)
+                        .defaultHeader("Connection", "close")
+                        .build()
+                        .post()
+                        .bodyValue(summary)
+                        .retrieve();
                 logger.info("Done with callback");
             }
             catch (Exception e) {
-                logger.error("Failed contacting callback", e);
+                throw new RuntimeException(e);
             }
         }
 
@@ -205,14 +197,16 @@ class CorpusThread extends Thread {
 }
 
 /**
- * @author bba1792 Dr. Herbert Lange
- * @version 20210630
+ * @author Herbert Lange
+ * @version 20240315
  * Resource to run the corpus checker on a corpus
  */
-@Path("check_corpus")
+@RestController
 public class CorpusChecker {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+//    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+    private static final Logger logger = Logger.getLogger(CorpusChecker.class.getName());
+    
 
     public CorpusChecker() {
 
@@ -225,15 +219,14 @@ public class CorpusChecker {
      * @return String that will be returned as a text/plain response.
      */
 
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response checkCorpus(@QueryParam("name") String name,
-                                @QueryParam("input") String input,
-                                @QueryParam("output") String output,
-                                @QueryParam("functions") String functions,
-                                @QueryParam("params") String paramStr,
-                                @QueryParam("token") String token,
-                                @QueryParam("callback") String callbackUrl) throws IOException {
+    @GetMapping(value = "check_corpus", produces = "text/plain")
+    public ResponseEntity<String> checkCorpus(@RequestParam(value="name", required=false) String name,
+                                              @RequestParam("input") String input,
+                                              @RequestParam("output") String output,
+                                              @RequestParam("functions") String functions,
+                                              @RequestParam(value="params", required=false) String paramStr,
+                                              @RequestParam("token") String token,
+                                              @RequestParam("callback") String callbackUrl) throws IOException {
         boolean error = false ;
         ArrayList<String> missing = new ArrayList<>();
         if (input == null) {
@@ -263,8 +256,8 @@ public class CorpusChecker {
         }
         if (error) {
             String errorMsg = "Missing parameters: " + String.join(", ", missing);
-            logger.error(errorMsg);
-            return Response.status(400).entity("400 - " + errorMsg).build();
+            logger.log(Level.SEVERE,errorMsg);
+            return new ResponseEntity<>(errorMsg, HttpStatus.BAD_REQUEST);
         }
         Properties params = new Properties();
         if (paramStr != null && !paramStr.equals("{}")) {
@@ -279,7 +272,7 @@ public class CorpusChecker {
                 logger.info(params.toString());
                 //params.putAll(mapper.convertValue(paramStr,Map.class));
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
         else {
@@ -288,9 +281,9 @@ public class CorpusChecker {
         CorpusThread ct = new CorpusThread(name,input,output,functions,params,token,callbackUrl);
         ct.start();
         Main.addThread(ct);
-        return Response.ok().entity("Executing " + functions + " on " + input +
+        return new ResponseEntity<>("Executing " + functions + " on " + input +
                 ". Result will be in " + output +
-                ". When finished " + callbackUrl + " will be accessed using " + token).build() ;
+                ". When finished " + callbackUrl + " will be accessed using " + token, HttpStatus.OK);
     }
 
 }
