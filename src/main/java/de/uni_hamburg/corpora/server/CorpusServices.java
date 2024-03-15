@@ -42,7 +42,7 @@ public class CorpusServices {
      * @return the set of corpus types
      */
     public static Set<String> getCorpusTypes () {
-        Reflections reflections = new Reflections("de.uni_hamburg.corpora");
+        Reflections reflections = new Reflections(new ConfigurationBuilder().forPackages(CorpusMagician.corpusFunctionPackages));
         HashSet<String> classNames = new HashSet<>();
         Set<Class<? extends CorpusData>> classes = reflections.getSubTypesOf(CorpusData.class);
         for (Class<? extends CorpusData> c : classes) {
