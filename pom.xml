@@ -85,12 +85,6 @@
             <artifactId>corpus-services-ng</artifactId>
             <version>1.0</version>
             <type>jar</type>
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.slf4j</groupId>-->
-<!--                    <artifactId>slf4j-simple</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
         </dependency>
     </dependencies>
 
